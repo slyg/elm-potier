@@ -18,7 +18,7 @@ type alias ID = Int
 
 init =
   { books =
-    [ {id = 0, title = "Henri"}
+    [ {id = 0, title = "Henri 1er de la classe"}
     , {id = 1, title = "Henri 2 le retour"}
     ]
   , nextId = 2
@@ -57,8 +57,8 @@ view address model =
   let books = List.map (bookItem address) model.books
   in
     div []
-      [ ul [] books
-      , button [ onClick address AddRandomBook ] [text "Add book"]
+      [ button [ onClick address AddRandomBook ] [text "Add book"]
+      , ul [] books
       ]
 
 

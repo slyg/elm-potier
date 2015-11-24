@@ -11027,12 +11027,13 @@ Elm.BookList.make = function (_elm) {
       var books = A2($List.map,bookItem(address),model.books);
       return A2($Html.div,
       _U.list([]),
-      _U.list([A2($Html.ul,_U.list([]),books)
-              ,A2($Html.button,
+      _U.list([A2($Html.button,
               _U.list([A2($Html$Events.onClick,address,AddRandomBook)]),
-              _U.list([$Html.text("Add book")]))]));
+              _U.list([$Html.text("Add book")]))
+              ,A2($Html.ul,_U.list([]),books)]));
    });
-   var init = {books: _U.list([{id: 0,title: "Henri"}
+   var init = {books: _U.list([{id: 0
+                               ,title: "Henri 1er de la classe"}
                               ,{id: 1,title: "Henri 2 le retour"}])
               ,nextId: 2};
    var Book = F2(function (a,b) {    return {id: a,title: b};});
