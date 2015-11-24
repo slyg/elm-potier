@@ -10987,18 +10987,6 @@ Elm.BookList.make = function (_elm) {
    $Result = Elm.Result.make(_elm),
    $Signal = Elm.Signal.make(_elm);
    var _op = {};
-   var bookItem = function (book) {
-      var bookText = A2($Basics._op["++"],
-      book.title,
-      A2($Basics._op["++"],
-      " (",
-      A2($Basics._op["++"],$Basics.toString(book.id),")")));
-      return A2($Html.li,
-      _U.list([]),
-      _U.list([A2($Html.span,
-      _U.list([]),
-      _U.list([$Html.text(bookText)]))]));
-   };
    var update = F2(function (action,model) {
       var _p0 = action;
       switch (_p0.ctor)
@@ -11006,15 +10994,37 @@ Elm.BookList.make = function (_elm) {
          case "AddRandomBook": var newBook = {id: model.nextId
                                              ,title: "random"};
            return _U.update(model,
-           {books: A2($List.append,model.books,_U.list([newBook]))
+           {books: A2($Basics._op["++"],model.books,_U.list([newBook]))
            ,nextId: model.nextId + 1});
-         default: return model;}
+         default: return _U.update(model,
+           {books: A2($List.filter,
+           function (book) {
+              return !_U.eq(book.id,_p0._0);
+           },
+           model.books)});}
    });
    var Noop = {ctor: "Noop"};
-   var RemoveBook = {ctor: "RemoveBook"};
+   var RemoveBook = function (a) {
+      return {ctor: "RemoveBook",_0: a};
+   };
+   var bookItem = F2(function (address,book) {
+      var bookText = A2($Basics._op["++"],
+      book.title,
+      A2($Basics._op["++"],
+      " (",
+      A2($Basics._op["++"],$Basics.toString(book.id),") ")));
+      return A2($Html.li,
+      _U.list([]),
+      _U.list([A2($Html.span,
+              _U.list([]),
+              _U.list([$Html.text(bookText)]))
+              ,A2($Html.button,
+              _U.list([A2($Html$Events.onClick,address,RemoveBook(book.id))]),
+              _U.list([$Html.text("x")]))]));
+   });
    var AddRandomBook = {ctor: "AddRandomBook"};
    var view = F2(function (address,model) {
-      var books = A2($List.map,bookItem,model.books);
+      var books = A2($List.map,bookItem(address),model.books);
       return A2($Html.div,
       _U.list([]),
       _U.list([A2($Html.ul,_U.list([]),books)

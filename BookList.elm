@@ -1,8 +1,7 @@
 module BookList where
 
-import Html exposing (div, span, ul, li, button, text)
+import Html exposing (Html, div, span, ul, li, button, text)
 import Html.Events exposing (..)
-import List exposing (append)
 
 -- Model
 
@@ -28,7 +27,7 @@ init =
 -- Update
 
 type Action = AddRandomBook
-            | RemoveBook
+            | RemoveBook ID
             | Noop
 
 update : Action -> Model -> Model
@@ -42,17 +41,20 @@ update action model =
         , title = "random"
         }
       in { model |
-          books = append model.books [newBook],
+          books = model.books ++ [newBook],
           nextId = model.nextId + 1
       }
-    RemoveBook ->
-      model
+    RemoveBook id ->
+      { model |
+        books = List.filter (\book -> book.id /= id) model.books
+      }
 
 
 -- View
 
+view : Signal.Address Action -> Model -> Html
 view address model =
-  let books = List.map bookItem model.books
+  let books = List.map (bookItem address) model.books
   in
     div []
       [ ul [] books
@@ -60,10 +62,10 @@ view address model =
       ]
 
 
-bookItem book =
-  let bookText = book.title ++ " (" ++ toString book.id ++ ")"
+bookItem address book =
+  let bookText = book.title ++ " (" ++ toString book.id ++ ") "
   in
     li []
       [ span [] [ text bookText ]
-      -- , button [ onClick address RemoveBook ] [ text "x" ]
+      , button [ onClick address (RemoveBook book.id) ] [ text "x" ]
       ]
