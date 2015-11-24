@@ -10972,6 +10972,45 @@ Elm.StartApp.Simple.make = function (_elm) {
                                         ,Config: Config
                                         ,start: start};
 };
+Elm.BookItem = Elm.BookItem || {};
+Elm.BookItem.make = function (_elm) {
+   "use strict";
+   _elm.BookItem = _elm.BookItem || {};
+   if (_elm.BookItem.values) return _elm.BookItem.values;
+   var _U = Elm.Native.Utils.make(_elm),
+   $Basics = Elm.Basics.make(_elm),
+   $Debug = Elm.Debug.make(_elm),
+   $Html = Elm.Html.make(_elm),
+   $Html$Events = Elm.Html.Events.make(_elm),
+   $List = Elm.List.make(_elm),
+   $Maybe = Elm.Maybe.make(_elm),
+   $Result = Elm.Result.make(_elm),
+   $Signal = Elm.Signal.make(_elm);
+   var _op = {};
+   var view = F3(function (address,context,model) {
+      var bookText = A2($Basics._op["++"],
+      model.title,
+      A2($Basics._op["++"],
+      " (",
+      A2($Basics._op["++"],$Basics.toString(model.id),") ")));
+      return A2($Html.li,
+      _U.list([]),
+      _U.list([A2($Html.span,
+              _U.list([]),
+              _U.list([$Html.text(bookText)]))
+              ,A2($Html.button,
+              _U.list([A2($Html$Events.onClick,
+              context.remove,
+              {ctor: "_Tuple0"})]),
+              _U.list([$Html.text("x")]))]));
+   });
+   var Context = function (a) {    return {remove: a};};
+   var Model = F2(function (a,b) {    return {id: a,title: b};});
+   return _elm.BookItem.values = {_op: _op
+                                 ,Model: Model
+                                 ,Context: Context
+                                 ,view: view};
+};
 Elm.BookList = Elm.BookList || {};
 Elm.BookList.make = function (_elm) {
    "use strict";
@@ -10979,6 +11018,7 @@ Elm.BookList.make = function (_elm) {
    if (_elm.BookList.values) return _elm.BookList.values;
    var _U = Elm.Native.Utils.make(_elm),
    $Basics = Elm.Basics.make(_elm),
+   $BookItem = Elm.BookItem.make(_elm),
    $Debug = Elm.Debug.make(_elm),
    $Html = Elm.Html.make(_elm),
    $Html$Events = Elm.Html.Events.make(_elm),
@@ -11007,24 +11047,15 @@ Elm.BookList.make = function (_elm) {
    var RemoveBook = function (a) {
       return {ctor: "RemoveBook",_0: a};
    };
-   var bookItem = F2(function (address,book) {
-      var bookText = A2($Basics._op["++"],
-      book.title,
-      A2($Basics._op["++"],
-      " (",
-      A2($Basics._op["++"],$Basics.toString(book.id),") ")));
-      return A2($Html.li,
-      _U.list([]),
-      _U.list([A2($Html.span,
-              _U.list([]),
-              _U.list([$Html.text(bookText)]))
-              ,A2($Html.button,
-              _U.list([A2($Html$Events.onClick,address,RemoveBook(book.id))]),
-              _U.list([$Html.text("x")]))]));
+   var viewBookItem = F2(function (address,model) {
+      var context = $BookItem.Context(A2($Signal.forwardTo,
+      address,
+      $Basics.always(RemoveBook(model.id))));
+      return A3($BookItem.view,address,context,model);
    });
    var AddRandomBook = {ctor: "AddRandomBook"};
    var view = F2(function (address,model) {
-      var books = A2($List.map,bookItem(address),model.books);
+      var books = A2($List.map,viewBookItem(address),model.books);
       return A2($Html.div,
       _U.list([]),
       _U.list([A2($Html.button,
@@ -11036,20 +11067,18 @@ Elm.BookList.make = function (_elm) {
                                ,title: "Henri 1er de la classe"}
                               ,{id: 1,title: "Henri 2 le retour"}])
               ,nextId: 2};
-   var Book = F2(function (a,b) {    return {id: a,title: b};});
    var Model = F2(function (a,b) {
       return {books: a,nextId: b};
    });
    return _elm.BookList.values = {_op: _op
                                  ,Model: Model
-                                 ,Book: Book
                                  ,init: init
                                  ,AddRandomBook: AddRandomBook
                                  ,RemoveBook: RemoveBook
                                  ,Noop: Noop
                                  ,update: update
                                  ,view: view
-                                 ,bookItem: bookItem};
+                                 ,viewBookItem: viewBookItem};
 };
 Elm.Main = Elm.Main || {};
 Elm.Main.make = function (_elm) {

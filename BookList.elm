@@ -3,17 +3,15 @@ module BookList where
 import Html exposing (Html, div, span, ul, li, button, text)
 import Html.Events exposing (..)
 
+import BookItem
+
 -- Model
 
 type alias Model =
-  { books: List (Book)
+  { books: List (BookItem.Model)
   , nextId: ID
   }
 
-type alias Book =
-  { id: Int
-  , title: String
-  }
 type alias ID = Int
 
 init =
@@ -49,23 +47,19 @@ update action model =
         books = List.filter (\book -> book.id /= id) model.books
       }
 
-
 -- View
 
-view : Signal.Address Action -> Model -> Html
+-- view : Signal.Address Action -> Model -> Html
 view address model =
-  let books = List.map (bookItem address) model.books
+  let books = List.map (viewBookItem address) model.books
   in
     div []
       [ button [ onClick address AddRandomBook ] [text "Add book"]
       , ul [] books
       ]
 
-
-bookItem address book =
-  let bookText = book.title ++ " (" ++ toString book.id ++ ") "
+viewBookItem address model =
+  let context =
+    BookItem.Context (Signal.forwardTo address (always (RemoveBook model.id)))
   in
-    li []
-      [ span [] [ text bookText ]
-      , button [ onClick address (RemoveBook book.id) ] [ text "x" ]
-      ]
+    BookItem.view address context model
