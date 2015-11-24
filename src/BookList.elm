@@ -14,15 +14,6 @@ type alias Model =
 
 type alias ID = Int
 
-init : Model
-init =
-  { books =
-    [ {id = 0, title = "Henri 1er de la classe"}
-    , {id = 1, title = "Henri 2 le retour"}
-    ]
-  , nextId = 2
-  }
-
 -- Update
 
 type Action = AddRandomBook
