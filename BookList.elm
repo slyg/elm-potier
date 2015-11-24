@@ -1,6 +1,6 @@
 module BookList where
 
-import Html exposing (Html, div, span, ul, li, button, text)
+import Html exposing (Html, div, span, ul, button, text)
 import Html.Events exposing (..)
 
 import BookItem
@@ -14,6 +14,7 @@ type alias Model =
 
 type alias ID = Int
 
+init : Model
 init =
   { books =
     [ {id = 0, title = "Henri 1er de la classe"}
@@ -49,7 +50,7 @@ update action model =
 
 -- View
 
--- view : Signal.Address Action -> Model -> Html
+view : Signal.Address Action -> Model -> Html
 view address model =
   let books = List.map (viewBookItem address) model.books
   in
@@ -58,8 +59,9 @@ view address model =
       , ul [] books
       ]
 
+viewBookItem : Signal.Address Action -> BookItem.Model -> Html
 viewBookItem address model =
   let context =
     BookItem.Context (Signal.forwardTo address (always (RemoveBook model.id)))
   in
-    BookItem.view address context model
+    BookItem.view context model

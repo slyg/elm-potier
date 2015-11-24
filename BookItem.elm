@@ -15,7 +15,8 @@ type alias Model =
 type alias Context =
   { remove : Signal.Address () }
 
-view address context model =
+view : Context -> Model -> Html
+view context model =
   let bookText = model.title ++ " (" ++ toString model.id ++ ") "
   in
     li []

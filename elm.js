@@ -10987,7 +10987,7 @@ Elm.BookItem.make = function (_elm) {
    $Result = Elm.Result.make(_elm),
    $Signal = Elm.Signal.make(_elm);
    var _op = {};
-   var view = F3(function (address,context,model) {
+   var view = F2(function (context,model) {
       var bookText = A2($Basics._op["++"],
       model.title,
       A2($Basics._op["++"],
@@ -11051,7 +11051,7 @@ Elm.BookList.make = function (_elm) {
       var context = $BookItem.Context(A2($Signal.forwardTo,
       address,
       $Basics.always(RemoveBook(model.id))));
-      return A3($BookItem.view,address,context,model);
+      return A2($BookItem.view,context,model);
    });
    var AddRandomBook = {ctor: "AddRandomBook"};
    var view = F2(function (address,model) {
