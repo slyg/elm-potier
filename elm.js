@@ -10987,20 +10987,32 @@ Elm.BookList.make = function (_elm) {
    $Result = Elm.Result.make(_elm),
    $Signal = Elm.Signal.make(_elm);
    var _op = {};
+   var bookItem = function (book) {
+      var bookText = A2($Basics._op["++"],
+      book.title,
+      A2($Basics._op["++"],
+      " (",
+      A2($Basics._op["++"],$Basics.toString(book.id),")")));
+      return A2($Html.li,
+      _U.list([]),
+      _U.list([A2($Html.span,
+      _U.list([]),
+      _U.list([$Html.text(bookText)]))]));
+   };
    var update = F2(function (action,model) {
       var _p0 = action;
-      if (_p0.ctor === "Noop") {
-            return model;
-         } else {
-            return _U.update(model,
-            {books: A2($List.append,model.books,_U.list(["random book"]))});
-         }
+      switch (_p0.ctor)
+      {case "Noop": return model;
+         case "AddRandomBook": var newBook = {id: model.nextId
+                                             ,title: "random"};
+           return _U.update(model,
+           {books: A2($List.append,model.books,_U.list([newBook]))
+           ,nextId: model.nextId + 1});
+         default: return model;}
    });
    var Noop = {ctor: "Noop"};
+   var RemoveBook = {ctor: "RemoveBook"};
    var AddRandomBook = {ctor: "AddRandomBook"};
-   var bookItem = function (book) {
-      return A2($Html.li,_U.list([]),_U.list([$Html.text(book)]));
-   };
    var view = F2(function (address,model) {
       var books = A2($List.map,bookItem,model.books);
       return A2($Html.div,
@@ -11010,16 +11022,23 @@ Elm.BookList.make = function (_elm) {
               _U.list([A2($Html$Events.onClick,address,AddRandomBook)]),
               _U.list([$Html.text("Add book")]))]));
    });
-   var init = {books: _U.list(["coucou","haha"])};
-   var Model = function (a) {    return {books: a};};
+   var init = {books: _U.list([{id: 0,title: "Henri"}
+                              ,{id: 1,title: "Henri 2 le retour"}])
+              ,nextId: 2};
+   var Book = F2(function (a,b) {    return {id: a,title: b};});
+   var Model = F2(function (a,b) {
+      return {books: a,nextId: b};
+   });
    return _elm.BookList.values = {_op: _op
                                  ,Model: Model
+                                 ,Book: Book
                                  ,init: init
-                                 ,view: view
-                                 ,bookItem: bookItem
                                  ,AddRandomBook: AddRandomBook
+                                 ,RemoveBook: RemoveBook
                                  ,Noop: Noop
-                                 ,update: update};
+                                 ,update: update
+                                 ,view: view
+                                 ,bookItem: bookItem};
 };
 Elm.Main = Elm.Main || {};
 Elm.Main.make = function (_elm) {
