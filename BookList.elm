@@ -1,6 +1,8 @@
 module BookList where
 
-import Html exposing (ul, li, text)
+import Html exposing (div, ul, li, button, text)
+import Html.Events exposing (..)
+import List exposing (append)
 
 -- Model
 
@@ -15,11 +17,24 @@ init = { books = ["coucou", "haha"] }
 view address model =
   let books = List.map bookItem model.books
   in
-    ul [] books
+    div []
+      [ ul [] books
+      , button [ onClick address AddRandomBook ] [text "Add book"]
+      ]
 
 
 bookItem book = li [] [ text book ]
 
 -- Update
 
-update action model = model
+type Action = AddRandomBook | Noop
+
+update : Action -> Model -> Model
+update action model =
+  case action of
+    Noop ->
+      model
+    AddRandomBook ->
+      { model |
+          books = append model.books ["random book"]
+      }
