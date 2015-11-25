@@ -26,11 +26,11 @@ init =
 
 type Action
   = BookListChange BookList.Action
-  | Noop
+  | NoOp
 
 update action model =
   case action of
-    Noop ->
+    NoOp ->
       model
     BookListChange act ->
       { model |

@@ -9,21 +9,21 @@ import BookItem
 
 type alias Model =
   { books: List (BookItem.Model)
-  , nextId: ID
+  , nextId: BookItem.ID
   }
-
-type alias ID = Int
 
 -- Update
 
-type Action = AddRandomBook
-            | RemoveBook ID
-            | Noop
+type Action
+  = AddRandomBook
+  | RemoveBook BookItem.ID
+  | AddToCart BookItem.ID BookItem.Action
+  | NoOp
 
 update : Action -> Model -> Model
 update action model =
   case action of
-    Noop ->
+    NoOp ->
       model
     AddRandomBook ->
       let newBook =
@@ -33,11 +33,14 @@ update action model =
       in { model |
           books = model.books ++ [newBook],
           nextId = model.nextId + 1
-      }
+        }
     RemoveBook id ->
       { model |
         books = List.filter (\book -> book.id /= id) model.books
       }
+
+    AddToCart id bookItemAction ->
+      model
 
 -- View
 
@@ -52,7 +55,8 @@ view address model =
 
 viewBookItem : Signal.Address Action -> BookItem.Model -> Html
 viewBookItem address model =
-  let context =
-    BookItem.Context (Signal.forwardTo address (always (RemoveBook model.id)))
+  let context = BookItem.Context
+        (Signal.forwardTo address (AddToCart model.id))
+        (Signal.forwardTo address (always (RemoveBook model.id)))
   in
     BookItem.view context model
