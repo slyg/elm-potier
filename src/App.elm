@@ -36,8 +36,8 @@ init =
 type Action
   = NoOp
   | AddRandomBook
-  | RemoveBook ID
   | AddToCart BookItem
+  | RemoveFromCart BookItem
 
 update action model =
   case action of
@@ -54,11 +54,6 @@ update action model =
       { model |
         books = model.books ++ [newBookItem model.nextId "Any book title"],
         nextId = model.nextId + 1
-      }
-
-    RemoveBook id ->
-      { model |
-        books = List.filter (\book -> book.id /= id) model.books
       }
 
     AddToCart book ->
@@ -87,9 +82,14 @@ update action model =
           nextId = model.nextId + 1
         }
 
+    RemoveFromCart book ->
+      { model |
+        cart = List.filter (\cartItem -> cartItem.book.id /= book.id) model.cart
+      }
+
 -- View
 
-view : Signal.Address Action -> Model -> Html 
+view : Signal.Address Action -> Model -> Html
 view address model =
   div []
     [ viewBookList address model
@@ -111,7 +111,6 @@ viewBookItem address model =
   li []
     [ span [] [ text (model.title ++ " - with id " ++ toString model.id ++ " ") ]
     , button [ onClick address (AddToCart model) ] [ text "Add to cart" ]
-    , button [ onClick address (RemoveBook model.id) ] [ text "x" ]
     ]
 
 viewCart : Signal.Address Action -> List(CartItem) -> Html
@@ -127,4 +126,5 @@ viewCartItem address model =
   [ span [] [text model.book.title]
   , span [] [text (" " ++ (toString model.book.id))]
   , span [] [text (" (x" ++ (toString model.amount) ++ ")")]
+  , button [ onClick address (RemoveFromCart model.book) ] [ text "x" ]
   ]
