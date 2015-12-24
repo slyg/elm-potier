@@ -2,7 +2,7 @@ module App where
 
 import Html exposing (..)
 import Html.Events exposing (..)
-import List
+import List exposing (map, any, filter)
 
 -- Model
 
@@ -31,39 +31,38 @@ init =
   , nextId = 0
   }
 
-newId : Model -> ID
-newId model =
-  model.nextId + 1
+-- Common Factories
+
+newBookItem : ID -> String -> BookItem
+newBookItem id title =
+  { id = id
+  , title = title
+  }
 
 -- Update
 
 type Action
-  = AddRandomBook
+  = AddRandomBooks
   | AddToCart BookItem
   | RemoveFromCart BookItem
 
 update action model =
   case action of
 
-    AddRandomBook ->
+    AddRandomBooks ->
       let
-        newBookItem id title =
-          { id = id
-          , title = title
-          }
+        numberOfItems = 5
       in
-      { model |
-        books = model.books ++ [newBookItem model.nextId "Any book title"],
-        nextId = newId model
-      }
+        { model |
+          books =
+            model.books
+              ++ map (\id -> newBookItem id "Any book title") [model.nextId..model.nextId + numberOfItems - 1],
+            nextId = model.nextId + numberOfItems
+        }
 
     AddToCart book ->
       let
         matchInCart = (\cartItem -> cartItem.book.id == book.id)
-        newBookItem id title =
-          { id = id
-          , title = title
-          }
         newCartItem id bookId title =
           { id = id
           , book = newBookItem bookId title
@@ -74,18 +73,18 @@ update action model =
             then { cartItem | amount = cartItem.amount + 1 }
             else cartItem
         newCart =
-          if List.any matchInCart model.cart
-            then List.map updateCartItem model.cart
+          if any matchInCart model.cart
+            then map updateCartItem model.cart
             else model.cart ++ [newCartItem model.nextId book.id book.title]
       in
         { model |
           cart = newCart,
-          nextId = newId model
+          nextId = model.nextId + 1
         }
 
     RemoveFromCart book ->
       { model |
-        cart = List.filter (\cartItem -> cartItem.book.id /= book.id) model.cart
+        cart = filter (\cartItem -> cartItem.book.id /= book.id) model.cart
       }
 
 -- View
@@ -100,10 +99,10 @@ view address model =
 viewBookList : Signal.Address Action -> Model -> Html
 viewBookList address model =
   let
-    books = List.map (viewBookItem address) model.books
+    books = map (viewBookItem address) model.books
   in
     div []
-      [ button [ onClick address AddRandomBook ] [text "Add book"]
+      [ button [ onClick address AddRandomBooks ] [text "Add books"]
       , ul [] books
       ]
 
@@ -117,7 +116,7 @@ viewBookItem address model =
 viewCart : Signal.Address Action -> List(CartItem) -> Html
 viewCart address model =
   let
-    books = List.map (viewCartItem address) model
+    books = map (viewCartItem address) model
   in
     ul [] books
 
