@@ -18,8 +18,7 @@ type alias BookItem =
   }
 type alias CartItem =
   { id: ID
-  , bookId: ID
-  , title: String
+  , book: BookItem
   , amount: Int
   }
 
@@ -64,15 +63,18 @@ update action model =
 
     AddToCart book ->
       let
-        matchInCart = (\cartItem -> cartItem.bookId == book.id)
-        newCartItem id bookId title =
+        matchInCart = (\cartItem -> cartItem.book.id == book.id)
+        newBookItem id title =
           { id = id
           , title = title
-          , bookId = bookId
+          }
+        newCartItem id bookId title =
+          { id = id
+          , book = newBookItem bookId title
           , amount = 1
           }
         updateCartItem cartItem =
-          if cartItem.bookId == book.id
+          if cartItem.book.id == book.id
             then { cartItem | amount = cartItem.amount + 1 }
             else cartItem
         newCart =
@@ -121,6 +123,7 @@ viewCart address model =
 viewCartItem : Signal.Address Action -> CartItem -> Html
 viewCartItem address model =
   li []
-  [ span [] [text model.title]
+  [ span [] [text model.book.title]
+  , span [] [text (" " ++ (toString model.book.id))]
   , span [] [text (" (x" ++ (toString model.amount) ++ ")")]
   ]
