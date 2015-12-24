@@ -32,18 +32,6 @@ init =
   , nextId = 0
   }
 
-newBookItem id title =
-  { id = id
-  , title = title
-  }
-
-newCartItem id bookId title =
-  { id = id
-  , title = title
-  , bookId = bookId
-  , amount = 1
-  }
-
 -- Update
 
 type Action
@@ -58,6 +46,12 @@ update action model =
     NoOp -> model
 
     AddRandomBook ->
+      let
+        newBookItem id title =
+          { id = id
+          , title = title
+          }
+      in
       { model |
         books = model.books ++ [newBookItem model.nextId "Any book title"],
         nextId = model.nextId + 1
@@ -69,15 +63,22 @@ update action model =
       }
 
     AddToCart book ->
-      let matchInCart = (\cartItem -> cartItem.bookId == book.id)
-          updateCartItem cartItem =
-            if cartItem.bookId == book.id
-              then { cartItem | amount = cartItem.amount + 1 }
-              else cartItem
-          newCart =
-            if List.any matchInCart model.cart
-              then List.map updateCartItem model.cart
-              else model.cart ++ [newCartItem model.nextId book.id book.title]
+      let
+        matchInCart = (\cartItem -> cartItem.bookId == book.id)
+        newCartItem id bookId title =
+          { id = id
+          , title = title
+          , bookId = bookId
+          , amount = 1
+          }
+        updateCartItem cartItem =
+          if cartItem.bookId == book.id
+            then { cartItem | amount = cartItem.amount + 1 }
+            else cartItem
+        newCart =
+          if List.any matchInCart model.cart
+            then List.map updateCartItem model.cart
+            else model.cart ++ [newCartItem model.nextId book.id book.title]
       in
         { model |
           cart = newCart,
@@ -94,7 +95,8 @@ view address model =
 
 viewBookList : Signal.Address Action -> Model -> Html
 viewBookList address model =
-  let books = List.map (viewBookItem address) model.books
+  let
+    books = List.map (viewBookItem address) model.books
   in
     div []
       [ button [ onClick address AddRandomBook ] [text "Add book"]
@@ -111,7 +113,8 @@ viewBookItem address model =
 
 viewCart : Signal.Address Action -> List(CartItem) -> Html
 viewCart address model =
-  let books = List.map (viewCartItem address) model
+  let
+    books = List.map (viewCartItem address) model
   in
     ul [] books
 
