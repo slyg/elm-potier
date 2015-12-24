@@ -51,41 +51,52 @@ update action model =
 
     AddRandomBooks ->
       let
+        nextId = model.nextId + numberOfItems
         numberOfItems = 5
+
+        newBooks =
+          model.books
+            ++ map (\id -> newBookItem id "Any book title") [model.nextId..model.nextId + numberOfItems - 1]
+
       in
         { model |
-          books =
-            model.books
-              ++ map (\id -> newBookItem id "Any book title") [model.nextId..model.nextId + numberOfItems - 1],
-            nextId = model.nextId + numberOfItems
+            books = newBooks,
+            nextId = nextId
         }
 
     AddToCart book ->
       let
+        nextId = model.nextId + 1
         matchInCart = (\cartItem -> cartItem.book.id == book.id)
+
         newCartItem id bookId title =
           { id = id
           , book = newBookItem bookId title
           , amount = 1
           }
+
         updateCartItem cartItem =
           if cartItem.book.id == book.id
             then { cartItem | amount = cartItem.amount + 1 }
             else cartItem
+
         newCart =
           if any matchInCart model.cart
             then map updateCartItem model.cart
             else model.cart ++ [newCartItem model.nextId book.id book.title]
+
       in
         { model |
-          cart = newCart,
-          nextId = model.nextId + 1
+            cart = newCart,
+            nextId = nextId
         }
 
     RemoveFromCart book ->
-      { model |
-        cart = filter (\cartItem -> cartItem.book.id /= book.id) model.cart
-      }
+      let
+        withoutBook = (\cartItem -> cartItem.book.id /= book.id)
+        newCart = filter withoutBook model.cart
+      in
+        { model | cart = newCart }
 
 -- View
 
