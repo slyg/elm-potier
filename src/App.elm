@@ -89,6 +89,7 @@ update action model =
 
 -- View
 
+view : Signal.Address Action -> Model -> Html 
 view address model =
   div []
     [ viewBookList address model
