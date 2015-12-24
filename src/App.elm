@@ -31,18 +31,19 @@ init =
   , nextId = 0
   }
 
+newId : Model -> ID
+newId model =
+  model.nextId + 1
+
 -- Update
 
 type Action
-  = NoOp
-  | AddRandomBook
+  = AddRandomBook
   | AddToCart BookItem
   | RemoveFromCart BookItem
 
 update action model =
   case action of
-
-    NoOp -> model
 
     AddRandomBook ->
       let
@@ -53,7 +54,7 @@ update action model =
       in
       { model |
         books = model.books ++ [newBookItem model.nextId "Any book title"],
-        nextId = model.nextId + 1
+        nextId = newId model
       }
 
     AddToCart book ->
@@ -79,7 +80,7 @@ update action model =
       in
         { model |
           cart = newCart,
-          nextId = model.nextId + 1
+          nextId = newId model
         }
 
     RemoveFromCart book ->
