@@ -1,7 +1,8 @@
 module App where
 
-import Html exposing (..)
-import Html.Events exposing (..)
+import Html exposing (Html, div, button, ul, li, span, text)
+import Html.Events exposing (onClick)
+import Html.Attributes exposing (style)
 import List exposing (map, any, filter)
 
 -- Model
@@ -113,16 +114,17 @@ viewBookList address model =
     books = map (viewBookItem address) model.books
   in
     div []
-      [ button [ onClick address AddRandomBooks ] [text "Add books"]
+      [ button [ onClick address AddRandomBooks ] [ text "Add books" ]
       , ul [] books
       ]
 
 viewBookItem : Signal.Address Action -> BookItem -> Html
 viewBookItem address model =
-  li []
-    [ span [] [ text (model.title ++ " - with id " ++ toString model.id ++ " ") ]
-    , button [ onClick address (AddToCart model) ] [ text "Add to cart" ]
+  li
+    [ onClick address (AddToCart model)
+    , style [ ("cursor", "pointer") ]
     ]
+    [ text (model.title ++ " - with id " ++ toString model.id ++ " ") ]
 
 viewCart : Signal.Address Action -> List(CartItem) -> Html
 viewCart address model =
@@ -134,8 +136,8 @@ viewCart address model =
 viewCartItem : Signal.Address Action -> CartItem -> Html
 viewCartItem address model =
   li []
-  [ span [] [text model.book.title]
-  , span [] [text (" " ++ (toString model.book.id))]
-  , span [] [text (" (x" ++ (toString model.amount) ++ ")")]
-  , button [ onClick address (RemoveFromCart model.book) ] [ text "x" ]
-  ]
+    [ span [] [text model.book.title]
+    , span [] [text (" " ++ (toString model.book.id))]
+    , span [] [text (" (x" ++ (toString model.amount) ++ ")")]
+    , button [ onClick address (RemoveFromCart model.book) ] [ text "x" ]
+    ]
