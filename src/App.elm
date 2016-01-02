@@ -5,7 +5,7 @@ import Html.Events exposing (onClick)
 import Html.Attributes exposing (style)
 import List exposing (map, any, filter)
 
--- Model
+-- Models
 
 type alias Model =
   { books: List (BookItem)
@@ -40,7 +40,14 @@ newBookItem id title =
   , title = title
   }
 
--- Update
+newCartItem : ID -> ID -> String -> CartItem
+newCartItem id bookId title =
+  { id = id
+  , book = newBookItem bookId title
+  , amount = 1
+  }
+
+-- Updates
 
 type Action
   = AddRandomBooks
@@ -52,29 +59,18 @@ update action model =
 
     AddRandomBooks ->
       let
-        nextId = model.nextId + numberOfItems
         numberOfItems = 5
-
-        newBooks =
-          model.books
-            ++ map (\id -> newBookItem id "Any book title") [model.nextId..model.nextId + numberOfItems - 1]
+        newBook index = newBookItem (model.nextId + index) "Any book title"
 
       in
         { model |
-            books = newBooks,
-            nextId = nextId
+            books = model.books ++ map newBook [1..numberOfItems],
+            nextId = model.nextId + numberOfItems
         }
 
     AddToCart book ->
       let
-        nextId = model.nextId + 1
         matchInCart = (\cartItem -> cartItem.book.id == book.id)
-
-        newCartItem id bookId title =
-          { id = id
-          , book = newBookItem bookId title
-          , amount = 1
-          }
 
         updateCartItem cartItem =
           if cartItem.book.id == book.id
@@ -89,17 +85,16 @@ update action model =
       in
         { model |
             cart = newCart,
-            nextId = nextId
+            nextId = model.nextId + 1
         }
 
     RemoveFromCart book ->
       let
         withoutBook = (\cartItem -> cartItem.book.id /= book.id)
-        newCart = filter withoutBook model.cart
       in
-        { model | cart = newCart }
+        { model | cart = filter withoutBook model.cart }
 
--- View
+-- Views
 
 view : Signal.Address Action -> Model -> Html
 view address model =
